@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Bergung - Ghost Net Fishing</title>
+    <h:outputStylesheet name="css/style.css"/>
+</h:head>
+
+<h:body>
+    <div class="header">
+        <h1>Ghost Net Fishing</h1>
+        <p>Bergung von Geisternetzen</p>
+    </div>
+
+    <div class="nav">
+        <h:link outcome="index" value="Startseite"/>
+        <h:link outcome="melden" value="Netz melden"/>
+        <h:link outcome="liste" value="Netze anzeigen"/>
+        <h:link outcome="bergung" value="Bergung"/>
+    </div>
+
+    <div class="container">
+        <p:growl id="messages" showDetail="true"/>
+
+        <!-- Zu bergende Netze -->
+        <div class="card">
+            <h2 class="card-title">Geisternetze zur Bergung verfügbar</h2>
+            <p>
+                Hier sehen Sie alle Geisternetze, die noch geborgen werden müssen.
+                Sie können sich für die Bergung eintragen oder ein bereits zugewiesenes
+                Netz als geborgen/verschollen melden.
+            </p>
+
+            <h:form id="bergungForm">
+                <p:dataTable id="zuBergendeTable"
+                             value="#{geisternetzController.zuBergendeNetze}"
+                             var="netz"
+                             rows="10"
+                             paginator="true"
+                             paginatorPosition="bottom"
+                             emptyMessage="Keine Geisternetze zur Bergung verfügbar."
+                             rowKey="#{netz.id}">
+
+                    <p:column headerText="ID" style="width: 60px;">
+                        <h:outputText value="#{netz.id}"/>
+                    </p:column>
+
+                    <p:column headerText="Koordinaten">
+                        <h:outputText value="#{netz.koordinatenString}"/>
+                    </p:column>
+
+                    <p:column headerText="Größe (m²)" style="width: 100px;">
+                        <h:outputText value="#{netz.groesse}"
+                                      rendered="#{netz.groesse != null}"/>
+                        <h:outputText value="k.A."
+                                      rendered="#{netz.groesse == null}"
+                                      style="color: #999;"/>
+                    </p:column>
+
+                    <p:column headerText="Status" style="width: 160px;">
+                        <span class="status-label status-#{netz.status}">
+                            #{netz.status.displayName}
+                        </span>
+                    </p:column>
+
+                    <p:column headerText="Bergung durch">
+                        <h:outputText value="#{netz.bergendePerson.name}"
+                                      rendered="#{netz.bergendePerson != null}"/>
+                        <h:outputText value="Noch niemand"
+                                      rendered="#{netz.bergendePerson == null}"
+                                      style="color: #e74c3c; font-style: italic;"/>
+                    </p:column>
+
+                    <p:column headerText="Aktionen" style="width: 300px;">
+                        <!-- Für Bergung eintragen (nur wenn noch niemand zugewiesen) -->
+                        <p:commandButton value="Für Bergung eintragen"
+                                         rendered="#{netz.bergendePerson == null}"
+                                         onclick="PF('bergungDialog#{netz.id}').show(); return false;"
+                                         styleClass="btn-primary"
+                                         style="margin-right: 5px;"/>
+
+                        <!-- Als geborgen melden -->
+                        <p:commandButton value="Geborgen"
+                                         action="#{geisternetzController.alsGeborgenMelden(netz.id)}"
+                                         update="zuBergendeTable messages @(.stats-container)"
+                                         rendered="#{netz.bergendePerson != null}"
+                                         styleClass="btn-primary btn-success"
+                                         style="margin-right: 5px;"/>
+
+                        <!-- Als verschollen melden -->
+                        <p:commandButton value="Verschollen"
+                                         onclick="PF('verschollenDialog#{netz.id}').show(); return false;"
+                                         styleClass="btn-primary btn-danger"/>
+
+                        <!-- Dialog: Für Bergung eintragen -->
+                        <p:dialog header="Für Bergung eintragen"
+                                  widgetVar="bergungDialog#{netz.id}"
+                                  modal="true"
+                                  width="400">
+                            <p:outputPanel>
+                                <p>Netz ##{netz.id} bei #{netz.koordinatenString}</p>
+                                <p><strong>Bitte geben Sie Ihre Kontaktdaten an:</strong></p>
+
+                                <div class="form-group">
+                                    <p:outputLabel for="bergerName#{netz.id}" value="Name:"/>
+                                    <p:inputText id="bergerName#{netz.id}"
+                                                 value="#{geisternetzController.bergerName}"
+                                                 required="true"
+                                                 style="width: 100%;"/>
+                                </div>
+
+                                <div class="form-group">
+                                    <p:outputLabel for="bergerTelefon#{netz.id}" value="Telefon:"/>
+                                    <p:inputText id="bergerTelefon#{netz.id}"
+                                                 value="#{geisternetzController.bergerTelefon}"
+                                                 required="true"
+                                                 style="width: 100%;"/>
+                                </div>
+
+                                <p:commandButton value="Eintragen"
+                                                 action="#{geisternetzController.fuerBergungEintragen(netz.id)}"
+                                                 update="zuBergendeTable messages"
+                                                 oncomplete="PF('bergungDialog#{netz.id}').hide();"
+                                                 styleClass="btn-primary btn-success"/>
+                            </p:outputPanel>
+                        </p:dialog>
+
+                        <!-- Dialog: Als verschollen melden -->
+                        <p:dialog header="Als verschollen melden"
+                                  widgetVar="verschollenDialog#{netz.id}"
+                                  modal="true"
+                                  width="400">
+                            <p:outputPanel>
+                                <p>Netz ##{netz.id} bei #{netz.koordinatenString}</p>
+                                <p style="color: #e74c3c;">
+                                    <strong>Hinweis:</strong> Verschollen-Meldungen können nicht anonym erfolgen!
+                                </p>
+
+                                <div class="form-group">
+                                    <p:outputLabel for="verschollenName#{netz.id}" value="Ihr Name:"/>
+                                    <p:inputText id="verschollenName#{netz.id}"
+                                                 value="#{geisternetzController.melderName}"
+                                                 required="true"
+                                                 style="width: 100%;"/>
+                                </div>
+
+                                <div class="form-group">
+                                    <p:outputLabel for="verschollenTelefon#{netz.id}" value="Telefon:"/>
+                                    <p:inputText id="verschollenTelefon#{netz.id}"
+                                                 value="#{geisternetzController.melderTelefon}"
+                                                 required="true"
+                                                 style="width: 100%;"/>
+                                </div>
+
+                                <p:commandButton value="Als verschollen melden"
+                                                 action="#{geisternetzController.alsVerschollenMelden(netz.id, geisternetzController.melderName, geisternetzController.melderTelefon)}"
+                                                 update="zuBergendeTable messages"
+                                                 oncomplete="PF('verschollenDialog#{netz.id}').hide();"
+                                                 styleClass="btn-primary btn-danger"/>
+                            </p:outputPanel>
+                        </p:dialog>
+                    </p:column>
+
+                </p:dataTable>
+
+                <div style="margin-top: 20px;">
+                    <p:commandButton value="Liste aktualisieren"
+                                     action="#{geisternetzController.aktualisiereListen()}"
+                                     update="zuBergendeTable messages"
+                                     styleClass="btn-primary"/>
+                </div>
+            </h:form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Ghost Net Fishing - Sea Shepherd Projekt</p>
+    </div>
+</h:body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Geisternetze - Ghost Net Fishing</title>
+    <h:outputStylesheet name="css/style.css"/>
+</h:head>
+
+<h:body>
+    <div class="header">
+        <h1>Ghost Net Fishing</h1>
+        <p>Übersicht aller Geisternetze</p>
+    </div>
+
+    <div class="nav">
+        <h:link outcome="index" value="Startseite"/>
+        <h:link outcome="melden" value="Netz melden"/>
+        <h:link outcome="liste" value="Netze anzeigen"/>
+        <h:link outcome="bergung" value="Bergung"/>
+    </div>
+
+    <div class="container">
+        <p:growl id="messages" showDetail="true"/>
+
+        <!-- Statistik -->
+        <div class="stats-container">
+            <div class="stat-box gemeldet">
+                <div class="stat-number">#{geisternetzController.anzahlGemeldet}</div>
+                <div class="stat-label">Gemeldet</div>
+            </div>
+            <div class="stat-box bergung">
+                <div class="stat-number">#{geisternetzController.anzahlBergungBevorstehend}</div>
+                <div class="stat-label">Bergung bevorstehend</div>
+            </div>
+            <div class="stat-box geborgen">
+                <div class="stat-number">#{geisternetzController.anzahlGeborgen}</div>
+                <div class="stat-label">Geborgen</div>
+            </div>
+            <div class="stat-box verschollen">
+                <div class="stat-number">#{geisternetzController.anzahlVerschollen}</div>
+                <div class="stat-label">Verschollen</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">Alle gemeldeten Geisternetze</h2>
+
+            <h:form id="listeForm">
+                <p:dataTable id="netzeTable"
+                             value="#{geisternetzController.alleNetze}"
+                             var="netz"
+                             rows="10"
+                             paginator="true"
+                             paginatorPosition="bottom"
+                             emptyMessage="Keine Geisternetze gefunden."
+                             rowKey="#{netz.id}"
+                             styleClass="ui-datatable">
+
+                    <p:column headerText="ID" style="width: 60px;">
+                        <h:outputText value="#{netz.id}"/>
+                    </p:column>
+
+                    <p:column headerText="Koordinaten">
+                        <h:outputText value="#{netz.koordinatenString}"/>
+                    </p:column>
+
+                    <p:column headerText="Größe (m²)" style="width: 100px;">
+                        <h:outputText value="#{netz.groesse}"
+                                      rendered="#{netz.groesse != null}"/>
+                        <h:outputText value="k.A."
+                                      rendered="#{netz.groesse == null}"
+                                      style="color: #999;"/>
+                    </p:column>
+
+                    <p:column headerText="Status" style="width: 160px;">
+                        <span class="status-label status-#{netz.status}">
+                            #{netz.status.displayName}
+                        </span>
+                    </p:column>
+
+                    <p:column headerText="Gemeldet von">
+                        <h:outputText value="#{netz.meldendePerson}"
+                                      rendered="#{netz.meldendePerson != null}"/>
+                        <h:outputText value="Anonym"
+                                      rendered="#{netz.meldendePerson == null}"
+                                      style="color: #999;"/>
+                    </p:column>
+
+                    <p:column headerText="Bergung durch">
+                        <h:outputText value="#{netz.bergendePerson.name}"
+                                      rendered="#{netz.bergendePerson != null}"/>
+                        <h:outputText value="-"
+                                      rendered="#{netz.bergendePerson == null}"
+                                      style="color: #999;"/>
+                    </p:column>
+
+                    <p:column headerText="Meldedatum" style="width: 150px;">
+                        <h:outputText value="#{netz.meldedatum}">
+                            <f:convertDateTime pattern="dd.MM.yyyy HH:mm" type="localDateTime"/>
+                        </h:outputText>
+                    </p:column>
+
+                </p:dataTable>
+
+                <div style="margin-top: 20px;">
+                    <p:commandButton value="Liste aktualisieren"
+                                     action="#{geisternetzController.aktualisiereListen()}"
+                                     update="netzeTable messages"
+                                     styleClass="btn-primary"/>
+                </div>
+            </h:form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Ghost Net Fishing - Sea Shepherd Projekt</p>
+    </div>
+</h:body>
+</html>

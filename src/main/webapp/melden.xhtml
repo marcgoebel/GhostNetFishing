@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Geisternetz melden - Ghost Net Fishing</title>
+    <h:outputStylesheet name="css/style.css"/>
+</h:head>
+
+<h:body>
+    <div class="header">
+        <h1>Ghost Net Fishing</h1>
+        <p>Geisternetz melden</p>
+    </div>
+
+    <div class="nav">
+        <h:link outcome="index" value="Startseite"/>
+        <h:link outcome="melden" value="Netz melden"/>
+        <h:link outcome="liste" value="Netze anzeigen"/>
+        <h:link outcome="bergung" value="Bergung"/>
+    </div>
+
+    <div class="container">
+        <p:growl id="messages" showDetail="true"/>
+
+        <div class="card">
+            <h2 class="card-title">Neues Geisternetz melden</h2>
+            <p>
+                Sie haben ein Geisternetz entdeckt? Bitte geben Sie die Koordinaten
+                und weitere Informationen ein. Eine anonyme Meldung ist möglich.
+            </p>
+
+            <h:form id="meldeForm">
+                <p:panel header="Standort des Geisternetzes">
+                    <div class="form-group">
+                        <p:outputLabel for="latitude" value="Breitengrad (Latitude):"/>
+                        <p:inputNumber id="latitude"
+                                       value="#{geisternetzController.latitude}"
+                                       required="true"
+                                       requiredMessage="Breitengrad ist erforderlich"
+                                       minValue="-90"
+                                       maxValue="90"
+                                       decimalPlaces="6"
+                                       placeholder="z.B. 54.3233"
+                                       style="width: 100%;"/>
+                        <p:message for="latitude"/>
+                    </div>
+
+                    <div class="form-group">
+                        <p:outputLabel for="longitude" value="Längengrad (Longitude):"/>
+                        <p:inputNumber id="longitude"
+                                       value="#{geisternetzController.longitude}"
+                                       required="true"
+                                       requiredMessage="Längengrad ist erforderlich"
+                                       minValue="-180"
+                                       maxValue="180"
+                                       decimalPlaces="6"
+                                       placeholder="z.B. 10.1394"
+                                       style="width: 100%;"/>
+                        <p:message for="longitude"/>
+                    </div>
+
+                    <div class="form-group">
+                        <p:outputLabel for="groesse" value="Geschätzte Größe (m²):"/>
+                        <p:inputNumber id="groesse"
+                                       value="#{geisternetzController.groesse}"
+                                       minValue="1"
+                                       maxValue="10000"
+                                       decimalPlaces="0"
+                                       placeholder="z.B. 50"
+                                       style="width: 100%;"/>
+                    </div>
+                </p:panel>
+
+                <p:panel header="Ihre Kontaktdaten (optional)">
+                    <div class="form-group">
+                        <p:selectBooleanCheckbox id="anonym"
+                                                 value="#{geisternetzController.anonym}">
+                            <p:ajax update="kontaktPanel"/>
+                        </p:selectBooleanCheckbox>
+                        <p:outputLabel for="anonym" value=" Anonym melden"/>
+                    </div>
+
+                    <p:outputPanel id="kontaktPanel">
+                        <p:panel rendered="#{!geisternetzController.anonym}">
+                            <div class="form-group">
+                                <p:outputLabel for="melderName" value="Ihr Name:"/>
+                                <p:inputText id="melderName"
+                                             value="#{geisternetzController.melderName}"
+                                             placeholder="Max Mustermann"
+                                             style="width: 100%;"/>
+                            </div>
+
+                            <div class="form-group">
+                                <p:outputLabel for="melderTelefon" value="Telefonnummer für Rückfragen:"/>
+                                <p:inputText id="melderTelefon"
+                                             value="#{geisternetzController.melderTelefon}"
+                                             placeholder="+49 123 456789"
+                                             style="width: 100%;"/>
+                            </div>
+                        </p:panel>
+                    </p:outputPanel>
+                </p:panel>
+
+                <div style="margin-top: 20px;">
+                    <p:commandButton value="Geisternetz melden"
+                                     action="#{geisternetzController.netzMelden()}"
+                                     update="messages"
+                                     styleClass="btn-primary btn-success"
+                                     style="margin-right: 10px;"/>
+                    <p:button value="Abbrechen" outcome="index" styleClass="btn-primary"/>
+                </div>
+            </h:form>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>Ghost Net Fishing - Sea Shepherd Projekt</p>
+    </div>
+</h:body>
+</html>
