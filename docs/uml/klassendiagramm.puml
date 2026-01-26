@@ -1,0 +1,143 @@
+@startuml Klassendiagramm Ghost Net Fishing
+
+title Ghost Net Fishing - Klassendiagramm (UML)
+
+' Styling
+skinparam classAttributeIconSize 0
+skinparam class {
+    BackgroundColor White
+    BorderColor #1a5276
+    ArrowColor #2980b9
+}
+
+' ===== MODEL SCHICHT =====
+package "Model (JPA Entities)" #E8F6F3 {
+
+    enum NetStatus {
+        GEMELDET
+        BERGUNG_BEVORSTEHEND
+        GEBORGEN
+        VERSCHOLLEN
+        --
+        + getDisplayName(): String
+    }
+
+    class Person << Entity >> {
+        - id: Long <<PK>>
+        - name: String
+        - telefonnummer: String
+        --
+        + Person()
+        + Person(name, telefonnummer)
+        + isAnonym(): boolean
+        + getId(): Long
+        + setId(Long): void
+        + getName(): String
+        + setName(String): void
+        + getTelefonnummer(): String
+        + setTelefonnummer(String): void
+    }
+
+    class Geisternetz << Entity >> {
+        - id: Long <<PK>>
+        - latitude: Double
+        - longitude: Double
+        - groesse: Integer
+        - status: NetStatus
+        - meldedatum: LocalDateTime
+        --
+        + Geisternetz()
+        + Geisternetz(latitude, longitude, groesse)
+        + getKoordinatenString(): String
+        + getId(): Long
+        + setId(Long): void
+        + getLatitude(): Double
+        + setLatitude(Double): void
+        + getLongitude(): Double
+        + setLongitude(Double): void
+        + getGroesse(): Integer
+        + setGroesse(Integer): void
+        + getStatus(): NetStatus
+        + setStatus(NetStatus): void
+        + getMeldedatum(): LocalDateTime
+        + getMeldendePerson(): Person
+        + setMeldendePerson(Person): void
+        + getBergendePerson(): Person
+        + setBergendePerson(Person): void
+    }
+}
+
+' ===== DAO SCHICHT =====
+package "DAO (Data Access Layer)" #FEF9E7 {
+
+    class GeisternetzDAO << ApplicationScoped >> {
+        - emf: EntityManagerFactory
+        --
+        + speichern(Geisternetz): void
+        + aktualisieren(Geisternetz): Geisternetz
+        + findById(Long): Geisternetz
+        + findAll(): List<Geisternetz>
+        + findZuBergende(): List<Geisternetz>
+        + findByStatus(NetStatus): List<Geisternetz>
+        + count(): long
+        + countByStatus(NetStatus): long
+    }
+
+    class PersonDAO << ApplicationScoped >> {
+        - emf: EntityManagerFactory
+        --
+        + speichern(Person): void
+        + aktualisieren(Person): Person
+        + findById(Long): Person
+        + findAll(): List<Person>
+        + findByName(String): List<Person>
+        + findNichtAnonyme(): List<Person>
+    }
+}
+
+' ===== CONTROLLER SCHICHT =====
+package "Controller (CDI Beans)" #FDEDEC {
+
+    class GeisternetzController << Named, SessionScoped >> {
+        - geisternetzDAO: GeisternetzDAO
+        - latitude: Double
+        - longitude: Double
+        - groesse: Integer
+        - melderName: String
+        - melderTelefon: String
+        - anonym: boolean
+        - bergerName: String
+        - bergerTelefon: String
+        - zuBergendeNetze: List<Geisternetz>
+        - alleNetze: List<Geisternetz>
+        --
+        + init(): void
+        + aktualisiereListen(): void
+        + netzMelden(): String
+        + fuerBergungEintragen(Long): String
+        + alsGeborgenMelden(Long): String
+        + alsVerschollenMelden(Long, String, String): String
+        + getAnzahlGemeldet(): long
+        + getAnzahlBergungBevorstehend(): long
+        + getAnzahlGeborgen(): long
+        + getAnzahlVerschollen(): long
+        + getAnzahlGesamt(): long
+    }
+}
+
+' ===== BEZIEHUNGEN =====
+' Model-Beziehungen
+Geisternetz "0..*" -- "0..1" Person : meldendePerson >
+Geisternetz "0..*" -- "0..1" Person : bergendePerson >
+Geisternetz --> NetStatus : status
+
+' DAO verwendet Entities
+GeisternetzDAO ..> Geisternetz : <<uses>>
+PersonDAO ..> Person : <<uses>>
+
+' Controller verwendet DAOs
+GeisternetzController --> GeisternetzDAO : verwendet
+GeisternetzController ..> Geisternetz : <<uses>>
+GeisternetzController ..> Person : <<uses>>
+
+@enduml

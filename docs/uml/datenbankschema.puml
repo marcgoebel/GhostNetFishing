@@ -1,0 +1,53 @@
+@startuml Datenbankschema Ghost Net Fishing
+
+title Ghost Net Fishing - ER-Diagramm (Datenbankstruktur)
+
+' Styling
+skinparam class {
+    BackgroundColor #E8F6F3
+    BorderColor #1a5276
+}
+
+entity "person" as person {
+    * **id** : BIGINT <<PK, AUTO_INCREMENT>>
+    --
+    name : VARCHAR(255) <<nullable>>
+    telefonnummer : VARCHAR(255) <<nullable>>
+}
+
+entity "geisternetz" as geisternetz {
+    * **id** : BIGINT <<PK, AUTO_INCREMENT>>
+    --
+    * latitude : DOUBLE
+    * longitude : DOUBLE
+    groesse : INT <<nullable>>
+    * status : VARCHAR(50)
+    meldedatum : DATETIME
+    --
+    meldende_person_id : BIGINT <<FK>>
+    bergende_person_id : BIGINT <<FK>>
+}
+
+' Beziehungen
+person ||--o{ geisternetz : "meldet (0..*)"
+person ||--o{ geisternetz : "birgt (0..*)"
+
+note right of geisternetz::status
+  Mögliche Werte:
+  - GEMELDET
+  - BERGUNG_BEVORSTEHEND
+  - GEBORGEN
+  - VERSCHOLLEN
+end note
+
+note bottom of person
+  Meldende Personen können
+  anonym sein (name = NULL,
+  telefonnummer = NULL).
+
+  Bergende Personen müssen
+  Name und Telefonnummer
+  angeben.
+end note
+
+@enduml

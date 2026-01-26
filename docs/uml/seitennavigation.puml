@@ -1,0 +1,66 @@
+@startuml Seitennavigation Ghost Net Fishing
+
+title Ghost Net Fishing - Seitennavigation
+
+' Styling
+skinparam state {
+    BackgroundColor #E8F6F3
+    BorderColor #1a5276
+}
+
+[*] --> index
+
+state "index.xhtml" as index {
+    index : Startseite
+    index : - Statistik-Übersicht
+    index : - Willkommenstext
+    index : - Navigation zu allen Seiten
+}
+
+state "melden.xhtml" as melden {
+    melden : Geisternetz melden
+    melden : - GPS-Koordinaten eingeben
+    melden : - Größe schätzen
+    melden : - Optional: Kontaktdaten
+    melden : - Checkbox: Anonym melden
+}
+
+state "liste.xhtml" as liste {
+    liste : Alle Geisternetze
+    liste : - DataTable mit Paginator
+    liste : - Status, Koordinaten, Melder
+    liste : - Bergungsperson anzeigen
+    liste : - Statistik-Boxen
+}
+
+state "bergung.xhtml" as bergung {
+    bergung : Bergung verwalten
+    bergung : - Zu bergende Netze
+    bergung : - Für Bergung eintragen
+    bergung : - Als geborgen melden
+    bergung : - Als verschollen melden
+}
+
+' Navigation
+index --> melden : "Netz melden"
+index --> liste : "Netze anzeigen"
+index --> bergung : "Bergung"
+
+melden --> liste : Nach erfolgreicher Meldung
+melden --> index : Abbrechen
+
+liste --> index : Startseite
+liste --> bergung : Bergung
+
+bergung --> liste : Nach Statusänderung
+bergung --> index : Startseite
+
+' Rücknavigation (überall möglich)
+note right of index
+  Navigation über
+  Menüleiste auf
+  allen Seiten
+  verfügbar
+end note
+
+@enduml
