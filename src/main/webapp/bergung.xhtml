@@ -100,28 +100,25 @@
                                   widgetVar="bergungDialog#{netz.id}"
                                   modal="true"
                                   width="400">
-                            <p:outputPanel>
+                            <p:outputPanel id="bergungPanel#{netz.id}">
                                 <p>Netz ##{netz.id} bei #{netz.koordinatenString}</p>
                                 <p><strong>Bitte geben Sie Ihre Kontaktdaten an:</strong></p>
 
                                 <div class="form-group">
-                                    <p:outputLabel for="bergerName#{netz.id}" value="Name:"/>
-                                    <p:inputText id="bergerName#{netz.id}"
-                                                 value="#{geisternetzController.bergerName}"
-                                                 required="true"
+                                    <h:outputLabel value="Name:"/>
+                                    <p:inputText value="#{geisternetzController.bergerName}"
                                                  style="width: 100%;"/>
                                 </div>
 
                                 <div class="form-group">
-                                    <p:outputLabel for="bergerTelefon#{netz.id}" value="Telefon:"/>
-                                    <p:inputText id="bergerTelefon#{netz.id}"
-                                                 value="#{geisternetzController.bergerTelefon}"
-                                                 required="true"
+                                    <h:outputLabel value="Telefon:"/>
+                                    <p:inputText value="#{geisternetzController.bergerTelefon}"
                                                  style="width: 100%;"/>
                                 </div>
 
                                 <p:commandButton value="Eintragen"
                                                  action="#{geisternetzController.fuerBergungEintragen(netz.id)}"
+                                                 process="@parent"
                                                  update="zuBergendeTable messages"
                                                  oncomplete="PF('bergungDialog#{netz.id}').hide();"
                                                  styleClass="btn-primary btn-success"/>
@@ -133,30 +130,27 @@
                                   widgetVar="verschollenDialog#{netz.id}"
                                   modal="true"
                                   width="400">
-                            <p:outputPanel>
+                            <p:outputPanel id="verschollenPanel#{netz.id}">
                                 <p>Netz ##{netz.id} bei #{netz.koordinatenString}</p>
                                 <p style="color: #e74c3c;">
                                     <strong>Hinweis:</strong> Verschollen-Meldungen können nicht anonym erfolgen!
                                 </p>
 
                                 <div class="form-group">
-                                    <p:outputLabel for="verschollenName#{netz.id}" value="Ihr Name:"/>
-                                    <p:inputText id="verschollenName#{netz.id}"
-                                                 value="#{geisternetzController.melderName}"
-                                                 required="true"
+                                    <h:outputLabel value="Ihr Name:"/>
+                                    <p:inputText value="#{geisternetzController.melderName}"
                                                  style="width: 100%;"/>
                                 </div>
 
                                 <div class="form-group">
-                                    <p:outputLabel for="verschollenTelefon#{netz.id}" value="Telefon:"/>
-                                    <p:inputText id="verschollenTelefon#{netz.id}"
-                                                 value="#{geisternetzController.melderTelefon}"
-                                                 required="true"
+                                    <h:outputLabel value="Telefon:"/>
+                                    <p:inputText value="#{geisternetzController.melderTelefon}"
                                                  style="width: 100%;"/>
                                 </div>
 
                                 <p:commandButton value="Als verschollen melden"
                                                  action="#{geisternetzController.alsVerschollenMelden(netz.id, geisternetzController.melderName, geisternetzController.melderTelefon)}"
+                                                 process="@parent"
                                                  update="zuBergendeTable messages"
                                                  oncomplete="PF('verschollenDialog#{netz.id}').hide();"
                                                  styleClass="btn-primary btn-danger"/>

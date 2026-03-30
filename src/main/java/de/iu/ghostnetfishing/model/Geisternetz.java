@@ -40,7 +40,7 @@ public class Geisternetz implements Serializable {
     private Person meldendePerson;
 
     // Die Person, die das Netz bergen möchte (kann null sein)
-    @ManyToOne
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "bergende_person_id")
     private Person bergendePerson;
 
