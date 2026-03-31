@@ -8,6 +8,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
 
 import java.io.Serializable;
@@ -27,6 +28,7 @@ public class GeisternetzController implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Inject
     private GeisternetzDAO geisternetzDAO;
 
     // Formularfelder für neues Geisternetz
@@ -48,7 +50,6 @@ public class GeisternetzController implements Serializable {
 
     @PostConstruct
     public void init() {
-        geisternetzDAO = new GeisternetzDAO();
         aktualisiereListen();
     }
 

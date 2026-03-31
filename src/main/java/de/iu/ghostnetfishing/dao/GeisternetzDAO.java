@@ -3,9 +3,9 @@ package de.iu.ghostnetfishing.dao;
 import de.iu.ghostnetfishing.model.Geisternetz;
 import de.iu.ghostnetfishing.model.NetStatus;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 
 import java.util.List;
@@ -13,16 +13,13 @@ import java.util.List;
 /**
  * Data Access Object für Geisternetz-Entitäten.
  * Zentralisiert alle Datenbankoperationen für Geisternetze.
+ * Nutzt CDI zur Injection der EntityManagerFactory.
  */
 @ApplicationScoped
 public class GeisternetzDAO {
 
-    private static final String PERSISTENCE_UNIT = "GhostNetFishingPU";
+    @Inject
     private EntityManagerFactory emf;
-
-    public GeisternetzDAO() {
-        this.emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
-    }
 
     private EntityManager getEntityManager() {
         return emf.createEntityManager();

@@ -2,9 +2,9 @@ package de.iu.ghostnetfishing.dao;
 
 import de.iu.ghostnetfishing.model.Person;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
 import jakarta.persistence.TypedQuery;
 
 import java.util.List;
@@ -12,16 +12,13 @@ import java.util.List;
 /**
  * Data Access Object für Person-Entitäten.
  * Zentralisiert alle Datenbankoperationen für Personen.
+ * Nutzt CDI zur Injection der EntityManagerFactory.
  */
 @ApplicationScoped
 public class PersonDAO {
 
-    private static final String PERSISTENCE_UNIT = "GhostNetFishingPU";
+    @Inject
     private EntityManagerFactory emf;
-
-    public PersonDAO() {
-        this.emf = Persistence.createEntityManagerFactory(PERSISTENCE_UNIT);
-    }
 
     private EntityManager getEntityManager() {
         return emf.createEntityManager();
